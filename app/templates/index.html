@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Ввод данных для визуализации:</h3>
+    <form action="" method="post" novalidate>
+        <p>
+            {{formST.tableSelector.label}} <br>
+            {{formST.tableSelector()}}
+            {% for error in formST.tableSelector.errors %}
+                <span style="color: rgb(255, 149, 0);">[{{ error }}]</span>
+            {% endfor %}
+            {{formST.submit}} 
+        </p> 
+    </form>
+    {% if formDP %}
+    <form action="" method="post" novalidate>
+            <p>
+                {{formDP.Parameters.label}} <br>
+                {{formDP.Parameters()}}
+            </p>   
+        <p>
+            {{formDP.dateStart.label}} <br>
+            {{formDP.dateStart()}}
+            {% for error in formDP.dateStart.errors %}
+                <span style="color: rgb(255, 149, 0);">[{{ error }}]</span>    
+            {% endfor %}
+            <br>
+            {{formDP.dateEnd.label}} <br>
+            {{formDP.dateEnd()}}
+            {% for error in formDP.dateEnd.errors %}
+                <span style="color: rgb(255, 149, 0);">[{{ error }}]</span>    
+            {% endfor %}
+        </p>
+        <p>{{formDP.submit()}}</p>
+    </form>
+    {% else %}
+        <p>Необходимо выбрать таблицу!</p>
+    {% endif %}
+
+    {% if chart %}
+        <p>График отображается</p>
+        <div id='chart' class='chart' style="height:525px; width:100%;"></div>
+        <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+        <script type='text/javascript'>
+            var graphs = {{ chart| safe}};
+            Plotly.plot('chart', graphs, {});
+        </script>
+    {% else %}
+        <p>Тут будет график!</p>
+    {% endif %}
+    
+{% endblock %}
