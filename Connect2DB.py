@@ -76,6 +76,15 @@ def DevideArchivesByFe(archives):
     archives.pop(4)
     return archives_fe
 
+def GetClearShihtaData(cursor, tablename, startDate, endDate, parameter):
+    query = f"""
+        SELECT date, time, {parameter} FROM `{tablename}` 
+        WHERE date BETWEEN '{startDate}' AND '{endDate}' AND 
+        shihta_status != 'Open Err'
+    """
+    ExecuteQuery(cursor=cursor, query=query)
+    result = GetResult(cursor)
+    return result
 
 def GetParametersFromTable(cursor, tablename):
     cursor.execute(f"""
@@ -90,6 +99,25 @@ def GetParametersFromTable(cursor, tablename):
         if result[i]['COLUMN_NAME'].find("status") == -1 and result[i]['COLUMN_NAME'].find("apc_on") == -1:
             paramArr.append(result[i]['COLUMN_NAME'])
     return paramArr
+
+def GetShihta(cursor, tablename, dataStart, dataEnd):
+    shihtaAllParamL = GetParametersFromTable(cursor=cursor, tablename=tablename)
+    shihtaAllParamLStr = ", ".join(shihtaAllParamL)
+    shihtaDataStruct = dict()
+    for i in shihtaAllParamL:
+        shihtaDataStruct[i] = list()
+    shihtaDataStruct['dateTime'] = list()
+    queryRes = GetClearShihtaData(cursor, tablename, dataStart, dataEnd, shihtaAllParamLStr)
+    for q in queryRes:
+        for key in q:
+            if key == "date" or key == "time":
+                pass
+            else:
+                shihtaDataStruct[key].append(q[key])
+
+    for q in queryRes:
+        shihtaDataStruct['dateTime'].append(Merge_Date_Time(q['date'], q['time']))
+    return shihtaDataStruct
 
 archives = ["archives__sec1", 
                 "archives__sec2", 

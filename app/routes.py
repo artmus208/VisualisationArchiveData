@@ -4,7 +4,6 @@ from plotly.subplots import make_subplots
 from app.forms import SelectDateParamForm, SelectTableForm
 from Connect2DB import *
 import json
-import pandas as pd
 import plotly
 import plotly.graph_objects as go
 import plotly.io as pio
@@ -59,7 +58,7 @@ def TS(ST):
         for ip, param in enumerate(cat):
             traces.append({'y':param['values'], 'x':time, 'name':param['paramName'], 'yaxis':'y'+str(ic+1)})
     layout = {'title': 'Архивные данные'}
-    layout['xaxis'] = dict(autorange=True,rangeslider=dict(autorange=True))
+    layout['xaxis'] = dict(autorange=True, rangeslider=dict(autorange=True))
     startDom = 0
     stepDom = 1/len(ST)
     for i in range(len(ST)):
@@ -69,6 +68,52 @@ def TS(ST):
     graphJSON = pio.to_json({'data': traces, 'layout': layout})
     return graphJSON  
 
+
+def GetJsonShihta(shihtaDataStruct):
+    fig = make_subplots(rows=2, cols=1, subplot_titles=("Процентное содержание железа", "Состав шихты"), 
+    shared_xaxes=True, vertical_spacing=0.1)
+    # Процентное содержание железа
+    fig.append_trace(go.Scatter(
+        x = shihtaDataStruct["dateTime"],
+        y = shihtaDataStruct['shihta_quality1'],
+        name = 'Ю',
+    ), row=1, col=1)
+    fig.append_trace(go.Scatter(
+        x = shihtaDataStruct["dateTime"],
+        y = shihtaDataStruct['shihta_quality2'],
+        name = 'Ц',
+    ), row=1, col=1)
+    fig.append_trace(go.Scatter(
+        x = shihtaDataStruct["dateTime"],
+        y = shihtaDataStruct['shihta_quality3'],
+        name = 'З',
+    ), row=1, col=1)
+
+    # Состав шихты
+    fig.append_trace(go.Scatter(
+        x = shihtaDataStruct["dateTime"],
+        y = shihtaDataStruct['shihta_percent1'], 
+        name = 'Ю',  stackgroup='one'
+    ), row=2, col=1)
+
+    fig.append_trace(go.Scatter(
+        x = shihtaDataStruct["dateTime"],
+        y = shihtaDataStruct['shihta_percent2'],  
+        name = 'Ц',
+        xaxis = 'x1', stackgroup='one'
+    ), row=2, col=1)
+
+    fig.append_trace(go.Scatter(
+        x = shihtaDataStruct["dateTime"],
+        y = shihtaDataStruct['shihta_percent3'],
+        name = 'З',
+        xaxis = 'x2', stackgroup='one'
+    ), row=2, col=1)
+    fig.update_traces(hovertemplate=None)
+    layout={'hovermode': 'x', "height":800, "xaxis2": dict(autorange=True,rangeslider=dict(autorange=True, thickness=0.07), type="date")}
+    fig.update_layout(layout)
+    graphJSON = pio.to_json(fig) 
+    return  graphJSON
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -93,6 +138,8 @@ def index():
             table=selectedTable, 
             dataStart=formDP.dateStart.data, 
             dataEnd=formDP.dateEnd.data)
+            shihtaData = GetShihta(cursor=cursor, tablename='archives__shihta', dataStart=formDP.dateStart.data, dataEnd=formDP.dateEnd.data)
+            shihtaGraph = GetJsonShihta(shihtaData)
             graph = TS(DS)
-            return render_template('index.html', formST=formST, formDP=formDP, chart=graph)
+            return render_template('index.html', formST=formST, formDP=formDP, chart=graph, chart1=shihtaGraph)
     return render_template("index.html", formST=formST, formDP=None)
