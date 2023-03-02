@@ -14,10 +14,13 @@
     </form>
     {% if formDP %}
     <form action="" method="post" novalidate>
-            <p>
-                {{formDP.Parameters.label}} <br>
-                {{formDP.Parameters()}}
-            </p>   
+        <div class="block" style=
+        "max-height: 200px;
+        max-width: 300px;
+        overflow-y: scroll;">            
+            {{formDP.Parameters.label}} <br>
+            {{formDP.Parameters()}}
+        </div>
         <p>
             {{formDP.dateStart.label}} <br>
             {{formDP.dateStart()}}
@@ -40,14 +43,14 @@
     {% if chart %}
         <p>График отображается</p>
         <div id='chart1' class='chart' style="height:100%; width:100%;"></div>
-        <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+        <script src='../static/scripts/plotly-latest.min.js'></script>
         <script type='text/javascript'>
             var graphs = {{ chart1| safe}};
             Plotly.plot('chart1', graphs, {});
         </script>
         <br><br>
         <div id='chart' class='chart' style="height:525px; width:100%;"></div>
-        <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+        <script src='../static/scripts/plotly-latest.min.js'></script>
         <script type='text/javascript'>
             var graphs = {{ chart| safe}};
             Plotly.plot('chart', graphs, {});

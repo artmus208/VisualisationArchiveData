@@ -123,7 +123,7 @@ def index():
     formST.tableSelector.choices = archives_gen
     formDP = SelectDateParamForm()
     if request.method == "POST":
-        if len(formDP.Parameters.data) == 0:
+        if len(formDP.Parameters.data) == 0: #len(formDP.Parameters.data) == 0
             selectedTable = formST.tableSelector.data
         if selectedTable is not None:
             tableParam = GetParametersFromTable(cursor, selectedTable)
