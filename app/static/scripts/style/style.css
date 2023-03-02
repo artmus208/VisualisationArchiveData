@@ -1,0 +1,6 @@
+.block{
+    max-height: 200px;
+    max-width: auto;
+    overflow-y: scroll;
+    max-width: auto;
+}
